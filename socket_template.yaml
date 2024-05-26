@@ -33,7 +33,7 @@ esphome:
   #这将允许（未来）项目识别，
   #配置和更新。
   project:
-    name: esphome.project-template
+    name: esphome.socket-template
     version: "3.0"
 
 esp8266:

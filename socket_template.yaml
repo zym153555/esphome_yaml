@@ -85,6 +85,18 @@ captive_portal:
 #   next_url: https://example.com/project-template/manual?ip={{ip_address}}&name={{device_name}}&version={{esphome_version}}   
 
 
+# Example configuration entry
+button:
+##恢复出厂设置
+  - platform: factory_reset
+    name: ${device_name}_reset
+    id : ${device_name}_reset
+##重启
+  - platform: restart
+    name: ${device_name}_restart
+##安全模式
+  - platform: safe_mode
+    name: ${device_name}_safe_mode
 
 
 web_server:
@@ -198,6 +210,14 @@ binary_sensor:
         - switch.toggle: "${device_name}_relay"     ##切换开关状态   
 
 
+    on_click:
+      min_length: 10s
+      max_length: 20s
+      then:
+        - button.press: ${device_name}_reset
+##恢复出厂设置开关
+
+
 
 ##输出配置
 output:
@@ -260,6 +280,8 @@ switch:
     #   then: 
     #     - light.turn_off: "paicha_blue_led"
     #     - light.turn_on: "paicha_red_led"
+
+
 
 ## 动作：ina高电平inb低电平       
 ## 复位：ina低电平inb高电平      

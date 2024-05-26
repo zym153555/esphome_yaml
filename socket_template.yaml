@@ -34,7 +34,7 @@ esphome:
   #配置和更新。
   project:
     name: esphome.project-template
-    version: "2.0"
+    version: "3.0"
 
 esp8266:
   board: esp01_1m
@@ -160,7 +160,7 @@ sensor:
       name: "BL0942 Frequency"
       accuracy_decimals: 2
 
-    update_interval: 1s
+    update_interval: 10s
 ##启动时间与信号强度
   # 无线信号强度
   - platform: wifi_signal # Reports the WiFi signal strength/RSSI in dB

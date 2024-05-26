@@ -1,3 +1,9 @@
+##10A共模插座固件（bl0942电量统计）
+1.0 单led指示插座状态
+3.0 双色led（1.插座状态2.连接状态）
+
+
+
 # ESPHome Project Template
 
 This repo serves as a template for creating a new ESPHome project.

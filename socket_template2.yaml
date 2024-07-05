@@ -1,8 +1,8 @@
 # These substitutions allow the end user to override certain values
 #这些替换允许最终用户覆盖某些值  2.0版本
 substitutions:
-  name: "socket-template"
-  friendly_name: "socket_template"
+  name: "socket-template2"
+  friendly_name: "socket_template2"
 # txd0-rx   rxd0-tx  io12-cf1  
 # io2-light
 # io0-key 

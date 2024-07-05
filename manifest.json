@@ -1,0 +1,60 @@
+{
+  "name": "Template Project",
+  "version": "",
+  "home_assistant_domain": "esphome",
+  "new_install_skip_erase": false,
+  "builds": [
+    {
+      "chipFamily": "ESP8266",
+      "ota": {
+        "path": "ali-socket-esp8266/ali-socket-esp8266.ota.bin",
+        "md5": "f4aa84098ed4cdb94235476e5fb48955"
+      },
+      "parts": [
+        {
+          "path": "ali-socket-esp8266/ali-socket-esp8266.factory.bin",
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "chipFamily": "ESP32",
+      "ota": {
+        "path": "project-template-esp32/project-template-esp32.ota.bin",
+        "md5": "7ec1f2fe0203fc9bd6d5d2a1b84e663a"
+      },
+      "parts": [
+        {
+          "path": "project-template-esp32/project-template-esp32.factory.bin",
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "chipFamily": "ESP8266",
+      "ota": {
+        "path": "project-template-esp8266/project-template-esp8266.ota.bin",
+        "md5": "8f508392380b5769c003d7b9c2cb4b4c"
+      },
+      "parts": [
+        {
+          "path": "project-template-esp8266/project-template-esp8266.factory.bin",
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "chipFamily": "ESP8266",
+      "ota": {
+        "path": "socket-template-esp8266/socket-template-esp8266.ota.bin",
+        "md5": "6ca545662f399e23509e6e3a43a41c9f"
+      },
+      "parts": [
+        {
+          "path": "socket-template-esp8266/socket-template-esp8266.factory.bin",
+          "offset": 0
+        }
+      ]
+    }
+  ]
+}

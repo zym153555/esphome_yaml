@@ -10,6 +10,6 @@ jobs:
     uses: esphome/workflows/.github/workflows/publish.yml@main
     with:
       # CHANGEME: Set the filenames of your config files here:
-      files: project-template-esp32.yaml,project-template-esp8266.yaml,socket_template.yaml,socket_template.yaml@v3.0,ali-socket.yaml@v1.1
+      files: project-template-esp32.yaml,project-template-esp8266.yaml,socket_template.yaml,socket_template.yaml@v3.0,ali-socket.yaml
       # CHANGEME: Set the name of your project here:
       name: Template Project

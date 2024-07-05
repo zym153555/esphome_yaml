@@ -8,7 +8,7 @@
       "chipFamily": "ESP8266",
       "ota": {
         "path": "ali-socket-esp8266/ali-socket-esp8266.ota.bin",
-        "md5": "3fcaf33cb5d74c7c3447c5e1d9d53b42"
+        "md5": "76ec5928aa5ad4628032bd6215bd120d"
       },
       "parts": [
         {
@@ -21,7 +21,7 @@
       "chipFamily": "ESP32",
       "ota": {
         "path": "project-template-esp32/project-template-esp32.ota.bin",
-        "md5": "225f65f18a97f74f0f5fe66ce5ffdb11"
+        "md5": "90f34538828866e15f882c50ec8da252"
       },
       "parts": [
         {
@@ -34,7 +34,7 @@
       "chipFamily": "ESP8266",
       "ota": {
         "path": "project-template-esp8266/project-template-esp8266.ota.bin",
-        "md5": "5c60345e456a973943abca18656e4d24"
+        "md5": "3e47cd69bf4b43ca5f59e602ac55630a"
       },
       "parts": [
         {
@@ -47,7 +47,7 @@
       "chipFamily": "ESP8266",
       "ota": {
         "path": "socket-template-esp8266/socket-template-esp8266.ota.bin",
-        "md5": "80bef4206b10aebdac23ff817f865848"
+        "md5": "aadd6311c3508629aca7cf655cf4dcff"
       },
       "parts": [
         {

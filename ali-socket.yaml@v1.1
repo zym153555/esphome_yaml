@@ -1,0 +1,244 @@
+# These substitutions allow the end user to override certain values
+#这些替换允许最终用户覆盖某些值
+substitutions:
+  name: "ali-socket"
+  friendly_name: "Ali_socket"
+  device_name: esp12f_socket
+  led_red: GPIO16
+  led_blue: GPIO12
+  relay: GPIO14
+  butten: GPIO13
+
+esphome:
+  name: "${name}"
+  # Friendly names are used where appropriate in Home Assistant
+  #在“家庭助理”中适当使用友好的名称
+  friendly_name: "${friendly_name}"
+  # Automatically add the mac address to the name
+  # so you can use a single firmware for all devices
+  #自动将mac地址添加到名称
+  #因此，您可以为所有设备使用单个固件
+  name_add_mac_suffix: true
+
+  # This will allow for (future) project identification,
+  # configuration and updates.
+  #这将允许（未来）项目识别，
+  #配置和更新。
+  project:
+    name: esphome.Ali_socket_project-template
+    version: "1.1"
+
+esp8266:
+  board: esp01_1m
+  restore_from_flash: True  ##状态保存
+
+preferences:
+  flash_write_interval: 5s  ##状态保存时间
+
+# To be able to get logs from the device via serial and api.
+#能够通过串行和api从设备获取日志。
+# Enable logging
+logger:
+  # level: WARN
+  baud_rate: 0
+# Enable Home Assistant API
+# API is a requirement of the dashboard import.
+#API是仪表板导入的要求。
+api:
+
+# OTA is required for Over-the-Air updating
+#空中更新需要OTA
+ota:
+  - platform: esphome
+# This should point to the public location of this yaml file.
+#这应该指向此yaml文件的公共位置。
+dashboard_import:
+  package_import_url: github://zym153555/esphome_yaml/ali-socket.yaml@v1.1
+  import_full_config: false # or true
+wifi:
+  # Set up a wifi access point
+  #设置wifi接入点
+  ap:
+    password: "12345678"
+# In combination with the `ap` this allows the user
+# to provision wifi credentials to the device.
+#与“ap”结合使用时
+#为设备提供wifi凭据。
+captive_portal:
+# Sets up Bluetooth LE (Only on ESP32) to allow the user
+# to provision wifi credentials to the device.
+#设置Bluetooth LE（仅在ESP32上）以允许用户
+#为设备提供wifi凭据。
+# esp32_improv:
+#   authorizer: none
+# Sets up the improv via serial client for Wi-Fi provisioning
+#通过串行客户端设置用于Wi-Fi设置的improv
+# improv_serial:
+#   next_url: https://example.com/project-template/manual?ip={{ip_address}}&name={{device_name}}&version={{esphome_version}}   
+web_server:
+  port: 80
+globals:
+   - id: auto_gl
+     type: int
+     restore_value: yes
+     initial_value: "1"
+
+
+binary_sensor:
+  - platform: gpio  #按键控制启动选择 长按5秒
+    pin:
+      number: $butten
+      inverted: true
+    name: "paicha_B1"
+    device_class: motion
+    id: "paicha_B1" 
+    on_click:
+    - min_length: 50ms
+      max_length: 1000ms
+      then:
+        - if:
+            condition:
+              lambda: 'return id(paicha_auto).state  ;'
+            then:
+              - switch.toggle: "paicha_relay"
+    - min_length: 5000ms
+      max_length: 10000ms
+      then:
+        - switch.toggle: 'paicha_auto'  
+
+
+
+light:
+  - platform: binary
+    output: light_output
+
+
+    restore_mode: RESTORE_DEFAULT_OFF
+    # name: "${device_name}_blue_led"
+    id: "paicha_blue_led"
+ 
+  - platform: status_led  ##状态指示灯
+    # name: "${device_name}_red_led"
+    restore_mode: RESTORE_DEFAULT_OFF
+
+
+    pin: $led_red
+    id: "paicha_red_led"
+
+
+output:
+  - id: light_output
+    platform: gpio
+    pin: $led_blue
+
+switch:
+  - platform: gpio   #继电器
+    pin: $relay
+    name: "${device_name}_relay"
+    id: "paicha_relay"  
+
+    restore_mode: RESTORE_DEFAULT_OFF
+
+    on_turn_on:
+      then: 
+        - light.turn_off: "paicha_red_led"
+        - light.turn_on: "paicha_blue_led"
+    on_turn_off:
+      then: 
+        - light.turn_off: "paicha_blue_led"
+        - light.turn_on: "paicha_red_led"
+
+
+
+  - platform: template   
+    name: "${device_name}_auto"
+    id: "paicha_auto"
+
+    restore_mode: RESTORE_DEFAULT_OFF
+
+    turn_on_action:
+      then:
+        - lambda: |-
+            id(auto_gl)=1;
+            ESP_LOGD("main", "I am at execution number %d", id(auto_gl));
+    turn_off_action:
+      then:
+        - lambda: |-
+            id(auto_gl)=0;
+            ESP_LOGD("main", "I am at execution number %d", id(auto_gl));
+    lambda: |-
+        return id(auto_gl);
+
+
+
+
+
+#文本传感器
+text_sensor:
+#
+  - platform: wifi_info
+    ip_address:
+      name: ${device_name}_ip
+    mac_address:
+      name: ${device_name}_mac
+    # ssid:
+    #   name: ${device_name}_SSID
+    # bssid:
+    #   name: ${device_name}_BSSID
+    # scan_results:
+    #   name: ${device_name}_Latest Scan Results
+    # dns_address:
+    #   name: ${device_name}_DNS Address
+
+
+
+sensor:
+##启动时间与信号强度
+  # 无线信号强度
+  - platform: wifi_signal # Reports the WiFi signal strength/RSSI in dB
+    name: "WiFi Signal dB"
+    id: wifi_signal_db
+    update_interval: 60s
+    entity_category: "diagnostic"
+  # 无线信号强度百分比   
+  - platform: copy # Reports the WiFi signal strength in %
+    source_id: wifi_signal_db
+    name: "WiFi Signal Percent"
+    id: WiFi_Signal_Percent
+    filters:
+      - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
+    unit_of_measurement: "Signal %"
+    entity_category: "diagnostic"
+    device_class: ""
+    # 启动时间统计
+  - platform: uptime
+    name: Uptime Sensor
+
+
+
+
+
+# # Example configuration entry
+# output:
+#   - platform: gpio
+#     pin: 14
+#     id: 'socket_out'
+#     inverted: False
+
+
+# switch:
+#   - platform: output
+#     name: "socket"
+#     output: 'socket_out'
+#     id: sw1
+
+# binary_sensor:
+#   - platform: gpio
+#     pin:
+#       number: GPIO13
+#       mode: INPUT_PULLUP
+#       inverted: True
+#     name: "socket"
+#     on_state:
+#       then:
+#       - switch.toggle: sw1

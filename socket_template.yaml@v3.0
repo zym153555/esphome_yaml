@@ -1,0 +1,321 @@
+# These substitutions allow the end user to override certain values
+#这些替换允许最终用户覆盖某些值
+substitutions:
+  name: "socket-template"
+  friendly_name: "socket_template"
+# txd0-rx   rxd0-tx  io12-cf1  
+# io2-light
+# io0-key 
+# io4-ina  io5-inb 
+  device_name: socket_template
+  bl0942_rx: GPIO3
+  bl0942_tx: GPIO1
+  bl0942_cf: GPIO12
+  led: GPIO2
+  led1: GPIO13
+  key: GPIO0
+  relay_ina: GPIO4
+  relay_inb: GPIO5
+
+esphome:
+  name: "${name}"
+  # Friendly names are used where appropriate in Home Assistant
+  #在“家庭助理”中适当使用友好的名称
+  friendly_name: "${friendly_name}"
+  # Automatically add the mac address to the name
+  # so you can use a single firmware for all devices
+  #自动将mac地址添加到名称
+  #因此，您可以为所有设备使用单个固件
+  name_add_mac_suffix: true
+
+  # This will allow for (future) project identification,
+  # configuration and updates.
+  #这将允许（未来）项目识别，
+  #配置和更新。
+  project:
+    name: esphome.socket-template
+    version: "3.0"
+
+esp8266:
+  board: esp01_1m
+  restore_from_flash: True  ##状态保存
+
+preferences:
+  flash_write_interval: 5s  ##状态保存时间
+
+# To be able to get logs from the device via serial and api.
+#能够通过串行和api从设备获取日志。
+# Enable logging
+logger:
+  # level: WARN
+  baud_rate: 0
+# Enable Home Assistant API
+# API is a requirement of the dashboard import.
+#API是仪表板导入的要求。
+api:
+
+# OTA is required for Over-the-Air updating
+#空中更新需要OTA
+ota:
+  - platform: esphome
+# This should point to the public location of this yaml file.
+#这应该指向此yaml文件的公共位置。
+dashboard_import:
+  package_import_url: github://zym153555/esphome_yaml/socket_template.yaml@v3.0
+  import_full_config: false # or true
+wifi:
+  # Set up a wifi access point
+  #设置wifi接入点
+  ap:
+    password: "12345678"
+# In combination with the `ap` this allows the user
+# to provision wifi credentials to the device.
+#与“ap”结合使用时
+#为设备提供wifi凭据。
+captive_portal:
+# Sets up Bluetooth LE (Only on ESP32) to allow the user
+# to provision wifi credentials to the device.
+#设置Bluetooth LE（仅在ESP32上）以允许用户
+#为设备提供wifi凭据。
+# esp32_improv:
+#   authorizer: none
+# Sets up the improv via serial client for Wi-Fi provisioning
+#通过串行客户端设置用于Wi-Fi设置的improv
+# improv_serial:
+#   next_url: https://example.com/project-template/manual?ip={{ip_address}}&name={{device_name}}&version={{esphome_version}}   
+
+
+# # Example configuration entry
+# button:
+# ##恢复出厂设置
+#   - platform: factory_reset
+#     name: ${device_name}_reset
+#     id : ${device_name}_reset
+# ##重启
+#   - platform: restart
+#     name: ${device_name}_restart
+# ##安全模式
+#   - platform: safe_mode
+#     name: ${device_name}_safe_mode
+
+
+web_server:
+  port: 80
+
+# globals:
+#    - id: auto_gl
+#      type: int
+#      restore_value: True
+#      initial_value: "1"
+
+# Example configuration entry
+uart:
+  id: uart_bus
+  tx_pin: $bl0942_tx
+  rx_pin: $bl0942_rx
+  baud_rate: 4800
+  stop_bits: 1
+
+
+
+
+
+#文本传感器
+text_sensor:
+#
+  - platform: wifi_info
+    ip_address:
+      name: ${device_name}_ip
+    mac_address:
+      name: ${device_name}_mac
+    # ssid:
+    #   name: ${device_name}_SSID
+    # bssid:
+    #   name: ${device_name}_BSSID
+    # scan_results:
+    #   name: ${device_name}_Latest Scan Results
+    # dns_address:
+    #   name: ${device_name}_DNS Address
+
+
+
+sensor:
+##bl0942
+  - platform: bl0942
+    uart_id: uart_bus
+    voltage:
+      name: 'BL0942 Voltage'
+    current:
+      name: 'BL0942 Current'
+      # filters:
+        # - offset: -0.05
+    power:
+      name: 'BL0942 Power'
+      filters:
+        - multiply: -1
+        # - offset: 5
+    energy:
+      name: 'BL0942 Energy'
+    frequency:
+      name: "BL0942 Frequency"
+      accuracy_decimals: 2
+
+    update_interval: 10s
+##启动时间与信号强度
+  # 无线信号强度
+  - platform: wifi_signal # Reports the WiFi signal strength/RSSI in dB
+    name: "WiFi Signal dB"
+    id: wifi_signal_db
+    update_interval: 60s
+    entity_category: "diagnostic"
+  # 无线信号强度百分比   
+  - platform: copy # Reports the WiFi signal strength in %
+    source_id: wifi_signal_db
+    name: "WiFi Signal Percent"
+    id: WiFi_Signal_Percent
+    filters:
+      - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
+    unit_of_measurement: "Signal %"
+    entity_category: "diagnostic"
+    device_class: ""
+    # 启动时间统计
+  - platform: uptime
+    name: Uptime Sensor
+
+
+
+
+
+
+
+##按键
+binary_sensor:
+  - platform: gpio  #按键控制启动选择     ##长按5秒，本地按钮无法控制，只能通过远程控制
+    pin:
+      number: $key
+      mode:
+        input: true
+        pullup: true
+      inverted: true
+    name: "${device_name}_mode"
+    device_class: motion
+    id: "${device_name}_mode" 
+    # on_release:
+    #   then:
+    #     - switch.toggle: "${device_name}_relay"
+    on_double_click:
+      min_length: 50ms
+      max_length: 1000ms
+      then:
+        - switch.toggle: "${device_name}_relay"     ##切换开关状态   
+
+
+    # on_click:
+    #   min_length: 10s
+    #   max_length: 20s
+    #   then:
+    #     - button.press: ${device_name}_reset
+##恢复出厂设置开关
+
+
+
+##输出配置
+output:
+  - id: light_output
+    platform: gpio
+    pin:
+      number: $led
+      inverted: true
+  - id: light_output1
+    platform: gpio
+    pin:
+      number: $led1
+      inverted: true
+
+##指示灯
+light:
+  - platform: binary
+    output: light_output
+    restore_mode: RESTORE_DEFAULT_OFF
+    # name: "${device_name}_led"
+    id: "${device_name}_led"
+    disabled_by_default: True   #如果为 true，则不应将此实体添加到任何客户端的前端， （通常是家庭助理）
+  - platform: status_led  ##状态指示灯
+    # name: "${device_name}_status_led"
+    # restore_mode: RESTORE_DEFAULT_OFF
+    output: light_output1
+    id: "${device_name}_status_led"
+
+
+
+
+switch:
+ #磁保持继电器状态控制ina、inb   
+  - platform: gpio  
+    pin: $relay_ina
+    # name: "${device_name}_relay_ina"
+    id: "${device_name}_relay_ina"  
+    disabled_by_default: True   #如果为 true，则不应将此实体添加到任何客户端的前端， （通常是家庭助理）
+    # restore_mode: RESTORE_DEFAULT_OFF
+    # on_turn_on:
+    #   then: 
+    #     - light.turn_off: "paicha_red_led"
+    #     - light.turn_on: "paicha_blue_led"
+    # on_turn_off:
+    #   then: 
+    #     - light.turn_off: "paicha_blue_led"
+    #     - light.turn_on: "paicha_red_led"
+
+  - platform: gpio   #继电器
+    pin: $relay_inb
+    # name: "${device_name}_relay_inb"
+    id: "${device_name}_relay_inb"  
+    disabled_by_default: True   #如果为 true，则不应将此实体添加到任何客户端的前端， （通常是家庭助理）
+    # restore_mode: RESTORE_DEFAULT_OFF
+    # on_turn_on:
+    #   then: 
+    #     - light.turn_off: "paicha_red_led"
+    #     - light.turn_on: "paicha_blue_led"
+    # on_turn_off:
+    #   then: 
+    #     - light.turn_off: "paicha_blue_led"
+    #     - light.turn_on: "paicha_red_led"
+
+
+
+## 动作：ina高电平inb低电平       
+## 复位：ina低电平inb高电平      
+## 保持：ina、inb皆为高\低电平 
+
+  - platform: template   
+    name: "${device_name}_relay"
+    id: "${device_name}_relay"
+    lambda: |-
+      if (id(${device_name}_relay_ina).state) {
+        return true;
+      } else {
+        return false;
+      }
+
+    restore_mode: RESTORE_DEFAULT_OFF
+
+    turn_on_action:
+      then:
+        - switch.turn_on: '${device_name}_relay_ina'
+        - switch.turn_off: '${device_name}_relay_inb'
+        - light.turn_on: "${device_name}_led"
+        - delay: 20ms
+        - switch.turn_on: '${device_name}_relay_ina'
+        - switch.turn_on: '${device_name}_relay_inb'  
+       
+    turn_off_action:
+      then:
+        - switch.turn_off: '${device_name}_relay_ina'
+        - switch.turn_on: '${device_name}_relay_inb'
+        - light.turn_off: "${device_name}_led"
+        - delay: 20ms
+        - switch.turn_off: '${device_name}_relay_ina'
+        - switch.turn_off: '${device_name}_relay_inb' 
+
+    # assumed_state: True
+    optimistic: False

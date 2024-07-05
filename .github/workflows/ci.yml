@@ -13,7 +13,7 @@ jobs:
           - project-template-esp32.yaml
           - project-template-esp8266.yaml
           - socket_template.yaml
-          - socket_template.yaml@v3.0
+          - socket_template2.yaml
           - ali-socket.yaml
     steps:
       - name: Checkout source code

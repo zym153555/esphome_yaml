@@ -2,7 +2,7 @@
   "chipFamily": "ESP8266",
   "ota": {
     "path": "ali-socket-esp8266/ali-socket-esp8266.ota.bin",
-    "md5": "415c7da7c56c2b72fecddbe19208af9d"
+    "md5": "f35b0f62af64e9fab84538f9e0607677"
   },
   "parts": [
     {

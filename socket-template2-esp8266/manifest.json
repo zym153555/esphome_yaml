@@ -2,7 +2,7 @@
   "chipFamily": "ESP8266",
   "ota": {
     "path": "socket-template2-esp8266/socket-template2-esp8266.ota.bin",
-    "md5": "4ad499345efc0c8a4d389fd51c5021ce"
+    "md5": "6ba3056f2f5e626b398458ea5e1656bf"
   },
   "parts": [
     {
